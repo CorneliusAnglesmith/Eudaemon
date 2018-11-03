@@ -9,6 +9,3 @@ build
 # Project-specific directories
 .gradle
 .idea
-
-# Gradle wrapper JAR
-gradle/wrapper/gradle-wrapper.jar
