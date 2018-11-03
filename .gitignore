@@ -1,6 +1,7 @@
 
 # Sensitive properties files
 */eudaemon.properties
+eudaemon.properties
 
 # Target directores
 build
