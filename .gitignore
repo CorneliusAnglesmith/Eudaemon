@@ -1,0 +1,13 @@
+
+# Sensitive properties files
+*/eudaemon.properties
+
+# Target directores
+build
+
+# Project-specific directories
+.gradle
+.idea
+
+# Gradle wrapper JAR
+gradle/wrapper/gradle-wrapper.jar
