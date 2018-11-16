@@ -1,5 +1,6 @@
 package net.anglesmith.eudaemon;
 
+import net.anglesmith.eudaemon.message.MessageService;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.entities.ChannelType;
@@ -19,6 +20,8 @@ public class Eudaemon extends ListenerAdapter {
     private static final Logger LOGGER = LogManager.getLogger(Eudaemon.class);
 
     private static final String CONFIG_FILE_LOCATION = "./eudaemon.properties";
+
+    private final MessageService messageService = new MessageService();
 
     public static void main(String[] args) {
         Configurations commonsConfigurations = new Configurations();
