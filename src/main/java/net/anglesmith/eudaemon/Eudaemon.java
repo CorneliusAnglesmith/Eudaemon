@@ -4,8 +4,6 @@ import net.anglesmith.eudaemon.message.MessageService;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.entities.ChannelType;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import org.apache.commons.configuration2.Configuration;
@@ -46,29 +44,8 @@ public class Eudaemon extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        JDA jda = event.getJDA();
-
-        User sender = event.getAuthor();
-
-        String senderName = sender.getName();
-        String message = event.getMessage().getContentDisplay();
-
-        boolean isSenderBot = sender.isBot();
-
-        if (event.isFromType(ChannelType.TEXT) && !isSenderBot) {
-            TextChannel channel = event.getTextChannel();
-
-            if (message.equals("Die please.")) {
-                LOGGER.info("Eudaemon chat kill switch activated by " + senderName + ".");
-
-                channel.sendMessage("Oof.").tts(true).queue();
-
-                jda.shutdown();
-
-                System.exit(0);
-            } else {
-                channel.sendMessage(String.format("I think I can hear you, %s; you said \"%s\"", senderName, message)).queue();
-            }
+        if (event.isFromType(ChannelType.TEXT)) {
+            this.messageService.handleTextMessage(event);
         }
     }
 }
