@@ -1,11 +1,13 @@
 plugins {
     id 'java'
     id 'application'
+    id 'org.springframework.boot' version '2.1.0.RELEASE'
 }
+
+apply plugin: 'io.spring.dependency-management'
 
 apply from: 'config/common.gradle'
 apply from: 'config/dependencies.gradle'
-
 
 group = 'net.anglesmith'
 version = project.artifactVersion
@@ -20,18 +22,8 @@ task ('copyPropertiesFile', type: Copy) {
     include "${project.configFileName}"
 }
 
-jar {
-    manifest {
-        attributes 'Implementation-Title': 'Eudaemon',
-            'Implementation-Version': version,
-            'Main-Class': mainClassName
-    }
-
+bootJar {
     baseName = project.name
-
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
 }
 
 jar.finalizedBy('copyPropertiesFile')

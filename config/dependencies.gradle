@@ -2,19 +2,27 @@
 apply plugin: 'java-library'
 
 dependencies {
-    api(group: 'org.apache.logging.log4j', name: 'log4j', version: '2.11.1')
-
-    api(group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.11.1')
+    // JDA
 
     implementation(group: 'net.dv8tion', name: 'JDA', version: '3.8.0_434') {
         exclude module: 'opus-java'
     }
+
+    // Apache
 
     implementation(group: 'org.apache.commons', name: 'commons-configuration2', version: '2.4')
 
     implementation(group: 'org.apache.commons', name: 'commons-lang3', version: '3.8.1')
 
     implementation(group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3')
+
+    // Spring
+
+    implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-web')
+
+    implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-actuator')
+
+    testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test')
 }
 
 repositories {
