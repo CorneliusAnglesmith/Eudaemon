@@ -34,6 +34,10 @@ public class MessageService {
                 controller.executeMessageCommand(messageEvent, messageContent);
             } catch (EudaemonCommandException e) {
                 LOGGER.error("A passed command failed to be processed.", e);
+            } catch (Exception e) { // Don't judge me.
+                LOGGER.fatal("Something really bad just happened", e);
+
+                messageEvent.getTextChannel().sendMessage("Whoa whoa buster!  Something you sent was really messed up.  Ask Ryan to check the logs.").queue();
             }
         }
     }
