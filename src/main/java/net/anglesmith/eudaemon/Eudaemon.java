@@ -31,6 +31,7 @@ public class Eudaemon extends ListenerAdapter {
     private final MessageService messageService = new MessageService();
 
     public static void main(String[] args) {
+
         SpringApplication.run(Eudaemon.class, args);
     }
 

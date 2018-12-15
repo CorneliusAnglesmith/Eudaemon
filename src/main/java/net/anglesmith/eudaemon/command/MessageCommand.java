@@ -1,6 +1,7 @@
 package net.anglesmith.eudaemon.command;
 
 import net.anglesmith.eudaemon.exception.EudaemonCommandException;
+import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 import java.util.List;
@@ -24,8 +25,9 @@ public interface MessageCommand {
     /**
      * Execute the preset Eudaemon command.
      *
+     * @return A {@link Message} containing an appropriate response.
      * @throws EudaemonCommandException if command arguments are not set before calling this command or if there were
      *                                  problems during execution.
      */
-    void execute() throws EudaemonCommandException;
+    Message execute() throws EudaemonCommandException;
 }

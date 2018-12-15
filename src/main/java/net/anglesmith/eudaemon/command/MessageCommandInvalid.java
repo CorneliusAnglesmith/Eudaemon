@@ -1,7 +1,8 @@
 package net.anglesmith.eudaemon.command;
 
 import net.anglesmith.eudaemon.exception.EudaemonCommandException;
-import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.MessageBuilder;
+import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
  */
 public class MessageCommandInvalid implements MessageCommand {
     private List<String> tokens;
-    private TextChannel messageTextChannel;
+    private MessageReceivedEvent textMessageEvent;
 
     /**
      * {@inheritDoc}
@@ -25,36 +26,38 @@ public class MessageCommandInvalid implements MessageCommand {
         }
 
         this.tokens = messageTokens;
-        this.messageTextChannel = messageEvent.getTextChannel();
+        this.textMessageEvent = messageEvent;
 
         return true;
     }
 
     @Override
-    public void execute() throws EudaemonCommandException {
-        if (this.messageTextChannel == null) {
+    public Message execute() throws EudaemonCommandException {
+        if (this.textMessageEvent == null) {
             throw new EudaemonCommandException("No message event was received");
         }
 
-        final StringBuilder response = new StringBuilder();
+        final MessageBuilder responseMessageBuilder = new MessageBuilder();
 
-        response.append("I had a problem understanding what you sent.");
+        responseMessageBuilder.append(this.textMessageEvent.getAuthor().getAsMention());
+
+        responseMessageBuilder.append(", I had a problem understanding what you sent.");
 
         if (this.tokens != null) {
             if (this.tokens.size() > 0) {
-                response.append(String.format("  I don't know what \"%s\" means.", this.tokens.get(0)));
+                responseMessageBuilder.append(String.format("  I don't know what \"%s\" means.", this.tokens.get(0)));
             }
 
             if (this.tokens.size() > 1) {
                 final String responseArguments = String.join(" ", this.tokens.subList(1, this.tokens.size()));
-                response.append(
-                        String.format("  You also sent \"%s\" as arguments; were you looking for a different command?",
-                                responseArguments));
+                responseMessageBuilder.append(
+                    String.format("  You also sent \"%s\" as arguments; were you looking for a different command?",
+                        responseArguments));
             }
         }
 
-        response.append("  Please try again.");
+        responseMessageBuilder.append("  Please try again.");
 
-        this.messageTextChannel.sendMessage(response.toString()).queue();
+        return responseMessageBuilder.build();
     }
 }

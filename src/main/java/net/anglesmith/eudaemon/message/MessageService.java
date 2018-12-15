@@ -2,6 +2,8 @@ package net.anglesmith.eudaemon.message;
 
 import net.anglesmith.eudaemon.command.CommandController;
 import net.anglesmith.eudaemon.exception.EudaemonCommandException;
+import net.dv8tion.jda.core.MessageBuilder;
+import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.apache.logging.log4j.LogManager;
@@ -17,8 +19,6 @@ public class MessageService {
 
     private static final String COMMAND_TOKEN = "$$";
 
-    private final CommandController controller = new CommandController();
-
     /**
      * Processes a message sent from a text channel and directs it to the appropriate behavior.
      *
@@ -30,15 +30,25 @@ public class MessageService {
         if (!messageEvent.getAuthor().isBot() && messageContent.startsWith(COMMAND_TOKEN)) {
             messageContent = messageContent.substring(2).trim();
 
+            Message response = null;
+
             try {
-                controller.executeMessageCommand(messageEvent, messageContent);
+                response = CommandController.executeMessageCommand(messageEvent, messageContent);
             } catch (EudaemonCommandException e) {
                 LOGGER.error("A passed command failed to be processed.", e);
             } catch (Exception e) { // Don't judge me.
                 LOGGER.fatal("Something really bad just happened", e);
 
-                messageEvent.getTextChannel().sendMessage("Whoa whoa buster!  Something you sent was really messed up.  Ask Ryan to check the logs.").queue();
+                response = new MessageBuilder("Whoa whoa buster!  Something you sent was really messed up.  Ask Ryan to check the logs.").build();
+            }
+
+            if (response != null) {
+                this.handleMessageResponse(messageEvent, response);
             }
         }
+    }
+
+    private void handleMessageResponse(MessageReceivedEvent messageEvent, Message response) {
+        messageEvent.getTextChannel().sendMessage(response).queue();
     }
 }

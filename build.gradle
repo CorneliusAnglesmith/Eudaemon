@@ -1,6 +1,8 @@
 plugins {
     id 'java'
     id 'application'
+    id 'antlr'
+    //id 'io.franzbecker.gradle-lombok' version '1.14'
     id 'org.springframework.boot' version '2.1.0.RELEASE'
 }
 
