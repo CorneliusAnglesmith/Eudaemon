@@ -98,6 +98,13 @@ public class DiceGrammarParseTreeVisitor extends AbstractParseTreeVisitor<Intege
             && context.getChild(1) instanceof DiceGrammarParser.OperatorContext;
     }
 
+    /**
+     * Interprets an {@link Integer} value from a terminal node, represented by a {@link Token}.
+     * @param nodeToken a {@link Token} to interpret a result from.
+     * @param nodeType a {@link String}, used to decide the parser rule that this {@link Token} falls under.
+     * @return An {@link Integer} representing the value of the node.
+     * @throws EudaemonParsingException if the node represents an invalid terminal token.
+     */
     private Integer calculateTerminalNodeValue(Token nodeToken, String nodeType) {
         Integer nodeValue = this.defaultResult();
 
@@ -112,12 +119,19 @@ public class DiceGrammarParseTreeVisitor extends AbstractParseTreeVisitor<Intege
                 break;
             default:
                 throw new EudaemonParsingException("Parser hit an invalid terminal token: "
-                        + nodeToken.getText() + ", type: " + nodeType);
+                    + nodeToken.getText() + ", type: " + nodeType);
         }
 
         return nodeValue;
     }
 
+    /**
+     * Interprets a {@link Token} as a dice value and attempts to "roll" it.
+     *
+     * @param diceToken a {@link Token} able to be interpreted as a standard die (e.g., 1d8)
+     * @return An {@link Integer}, the randomly determined result of "rolling" the die (or dice) specified.
+     * @throws EudaemonParsingException if the {@link Token} cannot be parsed as a die.
+     */
     private Integer rollDice(Token diceToken) {
         final String diceText = diceToken.getText().trim().toUpperCase();
 
@@ -150,6 +164,13 @@ public class DiceGrammarParseTreeVisitor extends AbstractParseTreeVisitor<Intege
         return diceResults.stream().mapToInt(Integer::intValue).sum();
     }
 
+    /**
+     * Attempts to interpret the contents of a {@link Token} as an {@link Integer} directly.
+     * @param numberToken A {@link Token} representing an integer value.
+     * @return An {@link Integer}.
+     * @throws EudaemonParsingException if the {@link Token} could not be interpreted as an integer.
+     * @see Integer#valueOf(String)
+     */
     private Integer interpretNumber(Token numberToken) {
         try {
             return Integer.valueOf(numberToken.getText().trim());
