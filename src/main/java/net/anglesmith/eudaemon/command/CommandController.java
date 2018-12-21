@@ -24,7 +24,7 @@ public class CommandController {
         final List<String> messageTokens = Arrays.asList(messageContent.trim().split("\\s"));
 
         final String commandEndpoint = messageTokens.size() != 0 ?
-                CommandToken.retrieveCommandEndpoint(messageTokens.get(0)) : null;
+                CommandToken.retrieveCommand(messageTokens.get(0)) : null;
 
         MessageCommand resolvedCommand = commandEndpoint != null && COMMAND_MAP.containsKey(commandEndpoint) ?
             COMMAND_MAP.get(commandEndpoint) : FALLBACK_COMMAND;

@@ -1,6 +1,7 @@
 package net.anglesmith.eudaemon.command;
 
 import net.anglesmith.eudaemon.command.dice.DiceGrammarLexer;
+import net.anglesmith.eudaemon.command.dice.DiceGrammarParseTreeVisitor;
 import net.anglesmith.eudaemon.command.dice.DiceGrammarParser;
 import net.anglesmith.eudaemon.exception.EudaemonCommandException;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -10,6 +11,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -23,11 +25,11 @@ public class MessageCommandRoll implements MessageCommand {
     public boolean accept(MessageReceivedEvent messageEvent, List<String> messageTokens) {
         boolean commandAccepted = true;
 
-        final String joinedTokens = String.join(" ", messageTokens);
+        final String joinedTokens = String.join(" ", messageTokens.subList(1, messageTokens.size()));
 
         Reader tokenReader = new StringReader(joinedTokens);
 
-        CharStream charStream = null;
+        CharStream charStream;
 
         try {
             charStream = CharStreams.fromReader(tokenReader);
@@ -51,9 +53,11 @@ public class MessageCommandRoll implements MessageCommand {
 
         ParseTree tree = parser.diceExpression();
 
-        final MessageBuilder responseMessageBuilder = new MessageBuilder();
+        final ParseTreeVisitor<Integer> visitor = new DiceGrammarParseTreeVisitor();
 
-        responseMessageBuilder.append(tree.getText());
+        final Integer result = visitor.visit(tree);
+
+        final MessageBuilder responseMessageBuilder = new MessageBuilder(String.valueOf(result));
 
         return responseMessageBuilder.build();
     }

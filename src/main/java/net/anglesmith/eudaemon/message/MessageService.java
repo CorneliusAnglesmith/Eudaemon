@@ -30,6 +30,8 @@ public class MessageService {
         if (!messageEvent.getAuthor().isBot() && messageContent.startsWith(COMMAND_TOKEN)) {
             messageContent = messageContent.substring(2).trim();
 
+            LOGGER.info("Eudaemon invoked with command " + messageContent);
+
             Message response = null;
 
             try {

@@ -21,7 +21,7 @@ public enum CommandToken {
         return "/" + this.commandName;
     }
 
-    public static String retrieveCommandEndpoint(String commandToken) {
+    public static String retrieveCommand(String commandToken) {
         Optional<CommandToken> optionalStream = Arrays.stream(CommandToken.values())
                 .filter(command -> commandToken.equals(command.toString()))
                 .findFirst();
@@ -29,7 +29,7 @@ public enum CommandToken {
         String commandEndpoint = null;
 
         if (optionalStream.isPresent()) {
-            commandEndpoint = optionalStream.get().endpointName();
+            commandEndpoint = optionalStream.get().toString();
         }
 
         return commandEndpoint;

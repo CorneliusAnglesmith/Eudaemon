@@ -4,40 +4,32 @@ grammar DiceGrammar;
     package net.anglesmith.eudaemon.command.dice;
 }
 
-fragment LITERAL_DICE : ([0-9]*[dD][0-9]+) ;
+LITERAL_DICE : WHITESPACE? DIGIT* DICE_SEPARATOR DIGIT+ ;
 
-fragment LITERAL_NUMBER : [0-9]+ ;
+LITERAL_NUMBER : WHITESPACE? DIGIT+ ;
 
-fragment WHITESPACE : [ \r\t\n]+ -> skip ;
+DIGIT : [0-9];
 
-operatorPlus : '+' ;
-operatorMinus : '-' ;
-operatorMultiply : '*' ;
-operatorDivide : '/' ;
+DICE_SEPARATOR : [dD];
 
-statementDivRight : ')';
+WHITESPACE : [ \r\t\n]+;
 
-statementDivLeft : '(';
+operatorPlus : WHITESPACE? '+' ;
+operatorMinus : WHITESPACE? '-' ;
+operatorMultiply : WHITESPACE? '*' ;
+operatorDivide : WHITESPACE? '/' ;
+
+statementDivRight : WHITESPACE? ')';
+
+statementDivLeft : WHITESPACE? '(';
 
 diceValue : LITERAL_DICE | LITERAL_NUMBER ;
 
-diceStatementCapture : statementDivLeft diceStatement statementDivRight ;
+operator : operatorPlus
+    | operatorMinus
+    | operatorMultiply
+    | operatorDivide;
 
-diceOperation : diceOperationPlus
-    | diceOperationMinus
-    | diceOperationMultiply
-    | diceOperationDivide;
-
-diceOperationPlus : diceStatement operatorPlus diceStatement ;
-diceOperationMinus : diceStatement operatorMinus diceStatement ;
-diceOperationMultiply : diceStatement operatorMultiply diceStatement ;
-diceOperationDivide : diceStatement operatorDivide diceStatement ;
-
-diceStatement : diceValue
-    | diceStatementCapture ;
-
-diceExpression : diceStatement
-    | diceOperation ;
-
-
-
+diceExpression : WHITESPACE? diceValue
+    | statementDivLeft diceExpression statementDivRight
+    | diceExpression operator diceExpression;
