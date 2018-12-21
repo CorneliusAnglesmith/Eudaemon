@@ -6,6 +6,7 @@ import net.anglesmith.eudaemon.command.dice.DiceGrammarParser;
 import net.anglesmith.eudaemon.exception.EudaemonCommandException;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -21,6 +22,8 @@ import java.util.List;
 public class MessageCommandRoll implements MessageCommand {
     private DiceGrammarLexer lexer;
 
+    private User user;
+
     @Override
     public boolean accept(MessageReceivedEvent messageEvent, List<String> messageTokens) {
         boolean commandAccepted = true;
@@ -34,6 +37,7 @@ public class MessageCommandRoll implements MessageCommand {
         try {
             charStream = CharStreams.fromReader(tokenReader);
             this.lexer = new DiceGrammarLexer(charStream);
+            this.user = messageEvent.getAuthor();
         } catch (IOException ex) {
             commandAccepted = false;
         }
@@ -57,7 +61,11 @@ public class MessageCommandRoll implements MessageCommand {
 
         final Integer result = visitor.visit(tree);
 
-        final MessageBuilder responseMessageBuilder = new MessageBuilder(String.valueOf(result));
+        final MessageBuilder responseMessageBuilder = new MessageBuilder();
+
+        responseMessageBuilder.append(this.user.getAsMention());
+        responseMessageBuilder.append(" ");
+        responseMessageBuilder.append(String.valueOf(result));
 
         return responseMessageBuilder.build();
     }
