@@ -6,11 +6,16 @@ import net.anglesmith.eudaemon.command.dice.DiceGrammarParseTreeVisitor;
 import net.anglesmith.eudaemon.command.dice.DiceGrammarParser;
 import net.anglesmith.eudaemon.exception.EudaemonCommandException;
 import net.anglesmith.eudaemon.exception.EudaemonParsingException;
+import net.anglesmith.eudaemon.message.Constants;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.ANTLRErrorStrategy;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
@@ -78,7 +83,7 @@ public class MessageCommandRoll implements MessageCommand {
 
         } catch (ParseCancellationException e) {
             if (e.getCause() instanceof RecognitionException) {
-                responseMessageBuilder.append("I can't interpret what you sent.  Check your spelling?");
+                responseMessageBuilder.append("That roll looks invalid.  Check your spelling?");
             } else {
                 throw new EudaemonCommandException("Input cannot be parsed as a dice expression.", e);
             }
@@ -87,5 +92,22 @@ public class MessageCommandRoll implements MessageCommand {
         }
 
         return responseMessageBuilder.build();
+    }
+
+    @Override
+    public Message documentation() {
+        final MessageBuilder docMessageBuilder = new MessageBuilder();
+        final String invokeExpression = Constants.COMMAND_INVOCATION_TOKEN + " " + CommandToken.COMMAND_ROLL.getCommandName();
+
+        docMessageBuilder.appendCodeBlock(
+            "Dice roll command.\n\n"
+            + "SYNOPSIS\n\t" + invokeExpression + " [dice roll expression]\n"
+            + "EXAMPLE\n\t" + invokeExpression + " 1d8 + 1\n"
+            + "\t> @user 6\n"
+            + "DESCRIPTION\n\tUse the Roll command with a typical tabletop dice roll expression to prompt the bot "
+            + "to simulate a roll with those properties.  Supports basic arithmetic and parenthetical expressions.",
+            "");
+
+        return docMessageBuilder.build();
     }
 }

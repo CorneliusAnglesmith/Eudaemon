@@ -30,4 +30,11 @@ public interface MessageCommand {
      *                                  problems during execution.
      */
     Message execute() throws EudaemonCommandException;
+
+    /**
+     * Present help documentation for this Eudaemon command.
+     *
+     * @return A {@link Message} containing helpful information about this command.
+     */
+    Message documentation();
 }

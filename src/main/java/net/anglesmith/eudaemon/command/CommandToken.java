@@ -4,7 +4,8 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public enum CommandToken {
-    COMMAND_ROLL("roll");
+    COMMAND_ROLL("roll"),
+    COMMAND_HELP("help");
 
     private final String commandName;
 
@@ -12,26 +13,13 @@ public enum CommandToken {
         this.commandName = command;
     }
 
-    @Override
-    public String toString() {
+    public static Optional<CommandToken> fromCommandString(String command) {
+        return Arrays.stream(CommandToken.values())
+            .filter(commandToken -> commandToken.commandName.equalsIgnoreCase(command))
+            .findFirst();
+    }
+
+    public String getCommandName() {
         return this.commandName;
-    }
-
-    public String endpointName() {
-        return "/" + this.commandName;
-    }
-
-    public static String retrieveCommand(String commandToken) {
-        Optional<CommandToken> optionalStream = Arrays.stream(CommandToken.values())
-                .filter(command -> commandToken.equals(command.toString()))
-                .findFirst();
-
-        String commandEndpoint = null;
-
-        if (optionalStream.isPresent()) {
-            commandEndpoint = optionalStream.get().toString();
-        }
-
-        return commandEndpoint;
     }
 }

@@ -1,6 +1,7 @@
 package net.anglesmith.eudaemon.command;
 
 import net.anglesmith.eudaemon.exception.EudaemonCommandException;
+import net.anglesmith.eudaemon.exception.EudaemonRuntimeException;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -59,5 +60,10 @@ public class MessageCommandInvalid implements MessageCommand {
         responseMessageBuilder.append("  Please try again.");
 
         return responseMessageBuilder.build();
+    }
+
+    @Override
+    public Message documentation() {
+        throw new EudaemonRuntimeException("Cannot resolve documentation for the placeholder 'Invalid' command.");
     }
 }
