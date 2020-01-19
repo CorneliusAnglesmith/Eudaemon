@@ -5,7 +5,8 @@ import java.util.Optional;
 
 public enum CommandToken {
     COMMAND_ROLL("roll"),
-    COMMAND_HELP("help");
+    COMMAND_HELP("help"),
+    COMMAND_LIST("list");
 
     private final String commandName;
 

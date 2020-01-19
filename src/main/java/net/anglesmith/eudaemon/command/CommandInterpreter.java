@@ -44,6 +44,8 @@ public class CommandInterpreter {
                     return new MessageCommandRoll();
                 case COMMAND_HELP:
                     return new MessageCommandHelp();
+                case COMMAND_LIST:
+                    return new MessageCommandList();
                 default:
                     throw new UnsupportedOperationException(
                             "The following command is not yet fully implemented: " + command);

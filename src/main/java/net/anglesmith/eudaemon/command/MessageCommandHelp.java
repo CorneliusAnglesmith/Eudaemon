@@ -30,6 +30,7 @@ public class MessageCommandHelp implements MessageCommand {
         if (StringUtils.isBlank(this.requestedCommand)) {
             Stream.of(CommandToken.values())
                 .map(CommandToken::getCommandName)
+                .sorted()
                 .map(CommandInterpreter::retrieveMessageCommandFromInvocation)
                 .flatMap(Optional::stream)
                 .map(MessageCommand::documentation)
