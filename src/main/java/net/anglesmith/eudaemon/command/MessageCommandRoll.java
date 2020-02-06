@@ -19,51 +19,30 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
 
+@Component
 public class MessageCommandRoll implements MessageCommand {
-    private DiceGrammarLexer lexer;
-
-    private User user;
-
-    private final ANTLRErrorStrategy errorStrategy = new DiceGrammarErrorStrategy();
+    private final ANTLRErrorStrategy ERROR_STRATEGY = new DiceGrammarErrorStrategy();
 
     @Override
-    public boolean accept(MessageReceivedEvent messageEvent, List<String> messageTokens) {
-        boolean commandAccepted = true;
-
-        final String joinedTokens = String.join(" ", messageTokens.subList(1, messageTokens.size()));
-
-        Reader tokenReader = new StringReader(joinedTokens);
-
-        CharStream charStream;
-
-        try {
-            charStream = CharStreams.fromReader(tokenReader);
-            this.lexer = new DiceGrammarLexer(charStream);
-            this.user = messageEvent.getAuthor();
-        } catch (IOException ex) {
-            commandAccepted = false;
-        }
-
-        return commandAccepted;
-    }
-
-    private long retrieveTokenValue() {
-        return 0;
+    public boolean validate(MessageReceivedEvent messageEvent, List<String> messageTokens) {
+        // FIXME - this should probably check the command for validity before parsing it...
+        return true;
     }
 
     @Override
-    public Message execute() throws EudaemonCommandException {
-        CommonTokenStream tokenStream = new CommonTokenStream(this.lexer);
+    public Message execute(MessageReceivedEvent messageEvent, List<String> messageTokens) throws EudaemonCommandException {
+        final CommonTokenStream tokenStream = new CommonTokenStream(this.retrieveLexerForCommand(messageTokens));
 
         DiceGrammarParser parser = new DiceGrammarParser(tokenStream);
 
-        parser.setErrorHandler(this.errorStrategy);
+        parser.setErrorHandler(ERROR_STRATEGY);
 
         final ParseTreeVisitor<Integer> visitor = new DiceGrammarParseTreeVisitor();
 
@@ -71,7 +50,7 @@ public class MessageCommandRoll implements MessageCommand {
 
         final MessageBuilder responseMessageBuilder = new MessageBuilder();
 
-        responseMessageBuilder.append(this.user.getAsMention());
+        responseMessageBuilder.append(messageEvent.getAuthor().getAsMention());
         responseMessageBuilder.append(" ");
 
         try {
@@ -94,6 +73,20 @@ public class MessageCommandRoll implements MessageCommand {
         return responseMessageBuilder.build();
     }
 
+    private DiceGrammarLexer retrieveLexerForCommand(List<String> messageTokens) throws EudaemonCommandException {
+        final DiceGrammarLexer lexer;
+        final Reader tokenReader = new StringReader(
+            String.join(" ", messageTokens.subList(1, messageTokens.size())));
+
+        try {
+            lexer = new DiceGrammarLexer(CharStreams.fromReader(tokenReader));
+        } catch (IOException ex) {
+            throw new EudaemonCommandException("Could not open character stream.");
+        }
+
+        return lexer;
+    }
+
     @Override
     public Message documentation() {
         final MessageBuilder docMessageBuilder = new MessageBuilder();
@@ -109,5 +102,10 @@ public class MessageCommandRoll implements MessageCommand {
             "");
 
         return docMessageBuilder.build();
+    }
+
+    @Override
+    public String invocationToken() {
+        return CommandToken.COMMAND_ROLL.getCommandName();
     }
 }

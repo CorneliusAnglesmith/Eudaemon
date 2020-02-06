@@ -12,45 +12,39 @@ import java.util.List;
  * This command is used as a fallback when the controller can't understand the passed command token.
  */
 public class MessageCommandInvalid implements MessageCommand {
-    private List<String> tokens;
-    private MessageReceivedEvent textMessageEvent;
-
     /**
      * {@inheritDoc}
      *
      * {@link MessageCommandInvalid} always returns <code>true</code> and is used as a fallback.
      */
     @Override
-    public boolean accept(MessageReceivedEvent messageEvent, List<String> messageTokens) {
+    public boolean validate(MessageReceivedEvent messageEvent, List<String> messageTokens) {
         if (messageEvent == null) {
             throw new IllegalArgumentException("Message event cannot be null.");
         }
-
-        this.tokens = messageTokens;
-        this.textMessageEvent = messageEvent;
 
         return true;
     }
 
     @Override
-    public Message execute() throws EudaemonCommandException {
-        if (this.textMessageEvent == null) {
+    public Message execute(MessageReceivedEvent messageEvent, List<String> messageTokens) throws EudaemonCommandException {
+        if (messageEvent == null) {
             throw new EudaemonCommandException("No message event was received");
         }
 
         final MessageBuilder responseMessageBuilder = new MessageBuilder();
 
-        responseMessageBuilder.append(this.textMessageEvent.getAuthor().getAsMention());
+        responseMessageBuilder.append(messageEvent.getAuthor().getAsMention());
 
         responseMessageBuilder.append(", I had a problem understanding what you sent.");
 
-        if (this.tokens != null) {
-            if (this.tokens.size() > 0) {
-                responseMessageBuilder.append(String.format("  I don't know what \"%s\" means.", this.tokens.get(0)));
+        if (messageTokens != null) {
+            if (messageTokens.size() > 0) {
+                responseMessageBuilder.append(String.format("  I don't know what \"%s\" means.", messageTokens.get(0)));
             }
 
-            if (this.tokens.size() > 1) {
-                final String responseArguments = String.join(" ", this.tokens.subList(1, this.tokens.size()));
+            if (messageTokens.size() > 1) {
+                final String responseArguments = String.join(" ", messageTokens.subList(1, messageTokens.size()));
                 responseMessageBuilder.append(
                     String.format("  You also sent \"%s\" as arguments; were you looking for a different command?",
                         responseArguments));
@@ -65,5 +59,11 @@ public class MessageCommandInvalid implements MessageCommand {
     @Override
     public Message documentation() {
         throw new EudaemonRuntimeException("Cannot resolve documentation for the placeholder 'Invalid' command.");
+    }
+
+    @Override
+    public String invocationToken() {
+        throw new UnsupportedOperationException(
+            "This fallback command should not be registered under an invocation token.");
     }
 }

@@ -8,40 +8,42 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 public class MessageCommandHelp implements MessageCommand {
-    private String requestedCommand;
+    private final Map<String, MessageCommand> commandMap;
+
+    public MessageCommandHelp(Map<String, MessageCommand> commandMap) {
+        this.commandMap = commandMap;
+    }
 
     @Override
-    public boolean accept(MessageReceivedEvent messageEvent, List<String> messageTokens) {
-        final String joinedTokens = String.join(" ", messageTokens.subList(1, messageTokens.size()));
-
-        this.requestedCommand = joinedTokens.trim();
-
+    public boolean validate(MessageReceivedEvent messageEvent, List<String> messageTokens) {
         return true;
     }
 
     @Override
-    public Message execute() throws EudaemonCommandException {
+    public Message execute(MessageReceivedEvent messageEvent, List<String> messageTokens) throws EudaemonCommandException {
+        final String joinedTokens = String.join(" ", messageTokens.subList(1, messageTokens.size()));
+
+        final var requestedCommand = joinedTokens.trim();
+
         final MessageBuilder documentationBuilder = new MessageBuilder();
 
-        if (StringUtils.isBlank(this.requestedCommand)) {
-            Stream.of(CommandToken.values())
-                .map(CommandToken::getCommandName)
-                .sorted()
-                .map(CommandInterpreter::retrieveMessageCommandFromInvocation)
-                .flatMap(Optional::stream)
+        if (StringUtils.isBlank(requestedCommand)) {
+            this.commandMap.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .map(Map.Entry::getValue)
                 .map(MessageCommand::documentation)
                 .map(Message::getContentRaw)
                 .forEach(content -> documentationBuilder.append("\n").append(content));
         } else {
             documentationBuilder.append(
-                CommandInterpreter.retrieveMessageCommandFromInvocation(this.requestedCommand)
+                Optional.ofNullable(this.commandMap.get(requestedCommand))
                     .map(MessageCommand::documentation)
                     .map(Message::getContentRaw)
-                    .orElse("Could not find documentation for '" + this.requestedCommand + "'."));
+                    .orElse("Could not find documentation for '" + requestedCommand + "'."));
         }
 
         return documentationBuilder.build();
@@ -50,7 +52,7 @@ public class MessageCommandHelp implements MessageCommand {
     @Override
     public Message documentation() {
         final MessageBuilder docMessageBuilder = new MessageBuilder();
-        final String invokeExpression = Constants.COMMAND_INVOCATION_TOKEN + " " + CommandToken.COMMAND_HELP.getCommandName();
+        final String invokeExpression = Constants.COMMAND_INVOCATION_TOKEN + " " + this.invocationToken();
 
         docMessageBuilder.appendCodeBlock(
             "Documentation command.\n\n"
@@ -59,5 +61,10 @@ public class MessageCommandHelp implements MessageCommand {
             "");
 
         return docMessageBuilder.build();
+    }
+
+    @Override
+    public String invocationToken() {
+        return CommandToken.COMMAND_HELP.getCommandName();
     }
 }

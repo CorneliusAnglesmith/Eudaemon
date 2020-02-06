@@ -20,16 +20,18 @@ public interface MessageCommand {
      * @param messageTokens A {@link List} of {@link String} tokens acting as arguments for this command.
      * @return <code>true</code> if the command is acceptable.
      */
-    boolean accept(MessageReceivedEvent messageEvent, List<String> messageTokens);
+    boolean validate(MessageReceivedEvent messageEvent, List<String> messageTokens);
 
     /**
      * Execute the preset Eudaemon command.
      *
+     * @param messageEvent A {@link MessageReceivedEvent} invoking this command.
+     * @param messageTokens A {@link List} of {@link String} tokens acting as arguments for this command.
      * @return A {@link Message} containing an appropriate response.
      * @throws EudaemonCommandException if command arguments are not set before calling this command or if there were
      *                                  problems during execution.
      */
-    Message execute() throws EudaemonCommandException;
+    Message execute(MessageReceivedEvent messageEvent, List<String> messageTokens) throws EudaemonCommandException;
 
     /**
      * Present help documentation for this Eudaemon command.
@@ -37,4 +39,11 @@ public interface MessageCommand {
      * @return A {@link Message} containing helpful information about this command.
      */
     Message documentation();
+
+    /**
+     * Present this command's requested invocation command token.
+     *
+     * @return a {@link String} containing the token this command should be registered under.
+     */
+    String invocationToken();
 }

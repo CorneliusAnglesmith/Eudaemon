@@ -5,25 +5,23 @@ import net.anglesmith.eudaemon.message.Constants;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Stream;
 
+@Component
 public class MessageCommandList implements MessageCommand {
-    private List<String> tokens;
-
     @Override
-    public boolean accept(MessageReceivedEvent messageEvent, List<String> messageTokens) {
-        this.tokens = messageTokens;
-
+    public boolean validate(MessageReceivedEvent messageEvent, List<String> messageTokens) {
         return true;
     }
 
     @Override
-    public Message execute() throws EudaemonCommandException {
+    public Message execute(MessageReceivedEvent messageEvent, List<String> messageTokens) throws EudaemonCommandException {
         final MessageBuilder builder = new MessageBuilder();
 
-        if (this.tokens.size() > 1) {
+        if (messageTokens.size() > 1) {
             builder.append("The List command takes no arguments.");
         } else {
             builder.append("The following commands are supported:\n");
@@ -59,5 +57,10 @@ public class MessageCommandList implements MessageCommand {
             "");
 
         return builder.build();
+    }
+
+    @Override
+    public String invocationToken() {
+        return CommandToken.COMMAND_LIST.getCommandName();
     }
 }

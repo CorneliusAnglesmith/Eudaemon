@@ -7,12 +7,20 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Service;
 
 /**
  * Redirects specific JDA messages to corresponding bot behavior.
  */
+@Service
 public class MessageService {
     private static final Logger LOGGER = LogManager.getLogger(MessageService.class);
+
+    private final CommandInterpreter commandInterpreter;
+
+    public MessageService(CommandInterpreter commandInterpreter) {
+        this.commandInterpreter = commandInterpreter;
+    }
 
     /**
      * Processes a message sent from a text channel and directs it to the appropriate behavior.
@@ -30,7 +38,7 @@ public class MessageService {
             Message response = null;
 
             try {
-                response = CommandInterpreter.executeMessageCommand(messageEvent, messageContent);
+                response = this.commandInterpreter.executeMessageCommand(messageEvent, messageContent);
             } catch (EudaemonCommandException e) {
                 LOGGER.error("A passed command failed to be processed.", e);
             } catch (Exception e) { // Don't judge me.
