@@ -5,13 +5,17 @@ import net.anglesmith.eudaemon.message.Constants;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.Map;
 
-@Component
 public class MessageCommandList implements MessageCommand {
+    private final Map<String, MessageCommand> commandMap;
+
+    public MessageCommandList(Map<String, MessageCommand> commandMap) {
+        this.commandMap = commandMap;
+    }
+
     @Override
     public boolean validate(MessageReceivedEvent messageEvent, List<String> messageTokens) {
         return true;
@@ -25,19 +29,19 @@ public class MessageCommandList implements MessageCommand {
             builder.append("The List command takes no arguments.");
         } else {
             builder.append("The following commands are supported:\n");
-            Stream.of(CommandToken.values())
-                .map(CommandToken::getCommandName)
-                .sorted()
-                .forEach(token ->
+            this.commandMap.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .map(Map.Entry::getValue)
+                .forEach(command ->
                     builder.append(":point_right: ")
-                        .append(String.format("**%s**", token))
+                        .append(String.format("**%s**", command.invocationToken()))
                         .append('\n'));
             builder.append("Use ")
                 .append(String.format("`%s %s`",
-                    Constants.COMMAND_INVOCATION_TOKEN, CommandToken.COMMAND_HELP.getCommandName()))
+                    Constants.COMMAND_INVOCATION_TOKEN, "help"))
                 .append(" for more information about all commands or ")
                 .append(String.format("`%s %s [command name]`",
-                    Constants.COMMAND_INVOCATION_TOKEN, CommandToken.COMMAND_HELP.getCommandName()))
+                    Constants.COMMAND_INVOCATION_TOKEN, "help"))
                 .append(" for a specific command.");
         }
 
@@ -48,7 +52,7 @@ public class MessageCommandList implements MessageCommand {
     public Message documentation() {
         final MessageBuilder builder = new MessageBuilder();
 
-        final String invokeExpression = Constants.COMMAND_INVOCATION_TOKEN + " " + CommandToken.COMMAND_LIST.getCommandName();
+        final String invokeExpression = Constants.COMMAND_INVOCATION_TOKEN + " " + this.invocationToken();
 
         builder.appendCodeBlock(
             "Command list utility.\n\n"

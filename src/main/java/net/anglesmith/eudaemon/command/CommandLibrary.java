@@ -16,8 +16,12 @@ public class CommandLibrary {
     public CommandLibrary(List<MessageCommand> registeredCommands) {
         this.registeredCommands =
             registeredCommands.stream().collect(Collectors.toMap(MessageCommand::invocationToken, command -> command));
+
+        // Load meta-commands
         final var helpCommand = new MessageCommandHelp(this.registeredCommands);
+        final var listCommand = new MessageCommandList(this.registeredCommands);
         this.registeredCommands.put(helpCommand.invocationToken(), helpCommand);
+        this.registeredCommands.put(listCommand.invocationToken(), listCommand);
     }
 
     public Optional<MessageCommand> retrieveMessageCommandFromInvocation(String command) {
