@@ -16,8 +16,8 @@ public class EventDao {
     }
 
     public void testConnection() {
-        final String sql = "SELECT 1 FROM SYSIBM.SYSDUMMY1;";
+        final String sql = "SELECT 1 FROM SYSIBM.SYSDUMMY1";
 
-        this.namedParameterJdbcTemplate.query(sql, (rs, i) -> rs.first());
+        this.namedParameterJdbcTemplate.query(sql, (rs, i) -> rs.getInt(1));
     }
 }
