@@ -2,10 +2,6 @@
 apply plugin: 'java-library'
 
 dependencies {
-    annotationProcessor(group: 'org.projectlombok', name: 'lombok', version: '1.16.22')
-
-    compileOnly(group: 'org.projectlombok', name: 'lombok', version: '1.16.22')
-
     // JDA
     implementation(group: 'net.dv8tion', name: 'JDA', version: '3.8.0_434') {
         exclude module: 'opus-java'
