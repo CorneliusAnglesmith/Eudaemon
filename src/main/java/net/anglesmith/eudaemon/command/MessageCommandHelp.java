@@ -2,9 +2,9 @@ package net.anglesmith.eudaemon.command;
 
 import net.anglesmith.eudaemon.exception.EudaemonCommandException;
 import net.anglesmith.eudaemon.message.Constants;
-import net.dv8tion.jda.core.MessageBuilder;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;

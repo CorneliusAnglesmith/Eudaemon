@@ -3,7 +3,7 @@ apply plugin: 'java-library'
 
 dependencies {
     // JDA
-    implementation(group: 'net.dv8tion', name: 'JDA', version: '3.8.0_434') {
+    implementation(group: 'net.dv8tion', name: 'JDA', version: '4.2.0_188') {
         exclude module: 'opus-java'
     }
 

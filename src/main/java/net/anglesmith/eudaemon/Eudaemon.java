@@ -1,8 +1,10 @@
 package net.anglesmith.eudaemon;
 
 import net.anglesmith.eudaemon.message.MessageService;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -56,7 +58,17 @@ public class Eudaemon implements CommandLineRunner {
 
             final String botToken = eudaemonConfiguration.getString("botToken");
 
-            JDA jda = new JDABuilder(botToken).addEventListener(new EudaemonListener(this.messageService)).build();
+            // Initialize JDA, giving the bot the ability to read messages, reactions, and member lists.
+            final JDA jda = JDABuilder.create(botToken,
+                    GatewayIntent.GUILD_MESSAGES,
+                    GatewayIntent.GUILD_MESSAGE_REACTIONS,
+                    GatewayIntent.GUILD_MEMBERS,
+                    GatewayIntent.DIRECT_MESSAGES,
+                    GatewayIntent.DIRECT_MESSAGE_REACTIONS)
+                .disableCache(CacheFlag.ACTIVITY, CacheFlag.VOICE_STATE, CacheFlag.EMOTE, CacheFlag.CLIENT_STATUS)
+                .addEventListeners(new EudaemonListener(this.messageService))
+                .build();
+
             jda.awaitReady();
 
             LOGGER.info("Eudaemon JDA startup completed.");
