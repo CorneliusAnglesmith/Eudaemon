@@ -11,15 +11,9 @@ dependencies {
     implementation(group: 'org.apache.commons', name: 'commons-configuration2', version: '2.4')
     implementation(group: 'org.apache.commons', name: 'commons-lang3', version: '3.8.1')
     implementation(group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3')
-    implementation(group: 'org.apache.derby', name: 'derby', version: '10.15.1.3')
-    implementation(group: 'org.apache.derby', name: 'derbytools', version: '10.15.1.3')
-    implementation(group: 'org.apache.derby', name: 'derbyshared', version: '10.15.1.3')
 
     // Spring
-    implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-web')
-    implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-actuator')
-    implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-data-jdbc')
-    testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test')
+    implementation(group: 'org.springframework.boot', name: 'spring-boot-starter')
 
     // ANTLR
     antlr (group: 'org.antlr', name: 'antlr4', version: '4.7.1')
