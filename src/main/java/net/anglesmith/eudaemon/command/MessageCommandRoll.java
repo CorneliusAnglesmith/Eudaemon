@@ -52,7 +52,7 @@ public class MessageCommandRoll implements MessageCommand {
 
             final DiceResultAggregator result = visitor.visit(tree);
             responseMessageBuilder.appendCodeBlock(
-                "Result: " + result.getValue() + "\n" + result.getLexicalValue(), "");
+                "Result: " + result.getValue() + "\n\n" + result.getLexicalValue(), "");
 
         } catch (ParseCancellationException e) {
             if (e.getCause() instanceof RecognitionException) {
