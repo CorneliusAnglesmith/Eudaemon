@@ -23,7 +23,7 @@ public class DiceAggregatingParseTreeVisitor extends AbstractParseTreeVisitor<Di
 
     private static final String WHITESPACE = "WHITESPACE";
 
-    private static final int MAX_DICE_COUNT = 50;
+    public static final int MAX_DICE_COUNT = 50;
 
     @Override
     protected DiceResultAggregator defaultResult() {
@@ -113,9 +113,10 @@ public class DiceAggregatingParseTreeVisitor extends AbstractParseTreeVisitor<Di
 
         final int diceValue = diceResults.stream().mapToInt(Integer::intValue).sum();
 
-        String lexicalValue = "[" + diceText + ": " +
-            diceResults.stream().map(Objects::toString).collect(Collectors.joining(", ")) +
-            "]";
+        String lexicalValue = "[" + diceText + ": "
+            + diceResults.stream().map(Objects::toString).collect(Collectors.joining(", "))
+            + (diceResults.size() > 1 ? " (" + diceValue + ")" : "")
+            + "]";
         return new DiceResultAggregator(diceValue, lexicalValue);
     }
 

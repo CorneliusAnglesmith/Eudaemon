@@ -18,6 +18,7 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -31,8 +32,14 @@ public class MessageCommandRoll implements MessageCommand {
 
     @Override
     public boolean validate(MessageReceivedEvent messageEvent, List<String> messageTokens) {
-        // FIXME - this should probably check the command for validity before parsing it...
-        return true;
+        return messageTokens.stream().anyMatch(token -> {
+            if (token.matches("[0-9]+[dD][0-9]+")) {
+                final String[] tokens = StringUtils.split(token, "dD");
+                return !(StringUtils.isNumeric(tokens[0])
+                    && Integer.parseInt(tokens[0]) > DiceAggregatingParseTreeVisitor.MAX_DICE_COUNT);
+            }
+            return true;
+        });
     }
 
     @Override
@@ -52,7 +59,7 @@ public class MessageCommandRoll implements MessageCommand {
 
             final DiceResultAggregator result = visitor.visit(tree);
             responseMessageBuilder.appendCodeBlock(
-                "Result: " + result.getValue() + "\n\n" + result.getLexicalValue(), "");
+                "Result: " + result.getValue() + "\n\nTrace:\n" + result.getLexicalValue(), "");
 
         } catch (ParseCancellationException e) {
             if (e.getCause() instanceof RecognitionException) {
@@ -90,9 +97,11 @@ public class MessageCommandRoll implements MessageCommand {
             "Dice roll command.\n\n"
             + "SYNOPSIS\n\t" + invokeExpression + " [dice roll expression]\n"
             + "EXAMPLE\n\t" + invokeExpression + " 1d8 + 1\n"
-            + "\t> @user 6\n"
             + "DESCRIPTION\n\tUse the Roll command with a typical tabletop dice roll expression to prompt the bot "
-            + "to simulate a roll with those properties.  Supports basic arithmetic and parenthetical expressions.",
+            + "to simulate a roll with those properties.  Supports basic arithmetic and parenthetical expressions."
+            + "\n\n\tOnly supports 50 simultaneous dice rolls in a single statement (e.g., 50d6 + 12d8 is fine, but "
+            + "100d6 is not).  Operation order is determined left-to-right, not by precedence.  Use parentheses if "
+            + "operation order matters for your roll.",
             "");
 
         return docMessageBuilder.build();
