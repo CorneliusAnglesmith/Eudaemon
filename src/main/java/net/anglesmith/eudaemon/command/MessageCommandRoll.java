@@ -1,9 +1,10 @@
 package net.anglesmith.eudaemon.command;
 
+import net.anglesmith.eudaemon.command.dice.DiceAggregatingParseTreeVisitor;
 import net.anglesmith.eudaemon.command.dice.DiceGrammarErrorStrategy;
 import net.anglesmith.eudaemon.command.dice.DiceGrammarLexer;
-import net.anglesmith.eudaemon.command.dice.DiceGrammarParseTreeVisitor;
 import net.anglesmith.eudaemon.command.dice.DiceGrammarParser;
+import net.anglesmith.eudaemon.command.dice.DiceResultAggregator;
 import net.anglesmith.eudaemon.exception.EudaemonCommandException;
 import net.anglesmith.eudaemon.exception.EudaemonParsingException;
 import net.anglesmith.eudaemon.message.Constants;
@@ -42,21 +43,16 @@ public class MessageCommandRoll implements MessageCommand {
 
         parser.setErrorHandler(ERROR_STRATEGY);
 
-        final ParseTreeVisitor<Integer> visitor = new DiceGrammarParseTreeVisitor();
-
-        Integer result = 0;
+        final ParseTreeVisitor<DiceResultAggregator> visitor = new DiceAggregatingParseTreeVisitor();
 
         final MessageBuilder responseMessageBuilder = new MessageBuilder();
-
-        responseMessageBuilder.append(messageEvent.getAuthor().getAsMention());
-        responseMessageBuilder.append(" ");
 
         try {
             ParseTree tree = parser.diceExpression();
 
-            result = visitor.visit(tree);
-
-            responseMessageBuilder.append(String.valueOf(result));
+            final DiceResultAggregator result = visitor.visit(tree);
+            responseMessageBuilder.appendCodeBlock(
+                "Result: " + result.getValue() + "\n" + result.getLexicalValue(), "");
 
         } catch (ParseCancellationException e) {
             if (e.getCause() instanceof RecognitionException) {
