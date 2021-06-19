@@ -48,7 +48,6 @@ public class Eudaemon implements CommandLineRunner {
 
         LOGGER.info(" ======== EUDAEMON ENVIRONMENT BEGIN ======== ");
         LOGGER.info("Application Name: " + this.applicationContext.getApplicationName());
-        LOGGER.info("Display Name: " + this.applicationContext.getDisplayName());
         LOGGER.info("Application ID: " + this.applicationContext.getId());
         LOGGER.info("Startup date: " + startupTime.toString());
         LOGGER.info(" ========  EUDAEMON ENVIRONMENT END  ======== ");

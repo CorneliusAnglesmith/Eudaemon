@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'application'
     id 'antlr'
-    id 'org.springframework.boot' version '2.3.2.RELEASE'
+    id 'org.springframework.boot' version '2.5.1'
 }
 
 apply plugin: 'io.spring.dependency-management'
@@ -12,7 +12,11 @@ apply from: 'config/dependencies.gradle'
 
 group = 'net.anglesmith'
 version = project.artifactVersion
-mainClassName = "${project.artifactMainClass}"
+
+springBoot {
+    mainClass.set("${project.artifactMainClass}")
+}
+
 
 sourceCompatibility = project.javaVersion
 targetCompatibility = project.javaVersion
