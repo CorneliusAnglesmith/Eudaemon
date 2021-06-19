@@ -17,7 +17,6 @@ springBoot {
     mainClass.set("${project.artifactMainClass}")
 }
 
-
 sourceCompatibility = project.javaVersion
 targetCompatibility = project.javaVersion
 
@@ -28,7 +27,7 @@ task ('copyPropertiesFile', type: Copy) {
 }
 
 bootJar {
-    baseName = project.name
+    archiveBaseName.set(project.name)
 }
 
 jar.finalizedBy('copyPropertiesFile')

@@ -62,9 +62,9 @@ public class Eudaemon implements CommandLineRunner {
                     GatewayIntent.GUILD_MESSAGES,
                     GatewayIntent.GUILD_MESSAGE_REACTIONS,
                     GatewayIntent.GUILD_MEMBERS,
+                    GatewayIntent.GUILD_VOICE_STATES,
                     GatewayIntent.DIRECT_MESSAGES,
                     GatewayIntent.DIRECT_MESSAGE_REACTIONS)
-                .disableCache(CacheFlag.ACTIVITY, CacheFlag.VOICE_STATE, CacheFlag.EMOTE, CacheFlag.CLIENT_STATUS)
                 .addEventListeners(new EudaemonListener(this.messageService))
                 .build();
 
