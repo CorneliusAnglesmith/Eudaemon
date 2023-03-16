@@ -8,9 +8,13 @@ import net.anglesmith.eudaemon.command.dice.DiceResultAggregator;
 import net.anglesmith.eudaemon.exception.EudaemonCommandException;
 import net.anglesmith.eudaemon.exception.EudaemonParsingException;
 import net.anglesmith.eudaemon.message.Constants;
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import net.dv8tion.jda.api.utils.MarkdownUtil;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.antlr.v4.runtime.ANTLRErrorStrategy;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -43,7 +47,7 @@ public class MessageCommandRoll implements MessageCommand {
     }
 
     @Override
-    public Message execute(MessageReceivedEvent messageEvent, List<String> messageTokens) throws EudaemonCommandException {
+    public MessageCreateData execute(MessageReceivedEvent messageEvent, List<String> messageTokens) throws EudaemonCommandException {
         final CommonTokenStream tokenStream = new CommonTokenStream(this.retrieveLexerForCommand(messageTokens));
 
         DiceGrammarParser parser = new DiceGrammarParser(tokenStream);
@@ -52,18 +56,18 @@ public class MessageCommandRoll implements MessageCommand {
 
         final ParseTreeVisitor<DiceResultAggregator> visitor = new DiceAggregatingParseTreeVisitor();
 
-        final MessageBuilder responseMessageBuilder = new MessageBuilder();
+        final MessageCreateBuilder responseMessageBuilder = new MessageCreateBuilder();
 
         try {
             ParseTree tree = parser.diceExpression();
 
             final DiceResultAggregator result = visitor.visit(tree);
-            responseMessageBuilder.appendCodeBlock(
-                "Result: " + result.getValue() + "\n\nTrace:\n" + result.getLexicalValue(), "");
+            responseMessageBuilder.addContent(MarkdownUtil.codeblock(
+                "Result: " + result.getValue() + "\n\nTrace:\n" + result.getLexicalValue(), ""));
 
         } catch (ParseCancellationException e) {
             if (e.getCause() instanceof RecognitionException) {
-                responseMessageBuilder.append("That roll looks invalid.  Check your spelling?");
+                responseMessageBuilder.addContent("That roll looks invalid. Check your spelling?");
             } else {
                 throw new EudaemonCommandException("Input cannot be parsed as a dice expression.", e);
             }
@@ -89,11 +93,11 @@ public class MessageCommandRoll implements MessageCommand {
     }
 
     @Override
-    public Message documentation() {
-        final MessageBuilder docMessageBuilder = new MessageBuilder();
+    public MessageCreateData documentation() {
+        final MessageCreateBuilder docMessageBuilder = new MessageCreateBuilder();
         final String invokeExpression = Constants.COMMAND_INVOCATION_TOKEN + " " + CommandToken.COMMAND_ROLL.getCommandName();
 
-        docMessageBuilder.appendCodeBlock(
+        docMessageBuilder.addContent(MarkdownUtil.codeblock(
             "Dice roll command.\n\n"
             + "SYNOPSIS\n\t" + invokeExpression + " [dice roll expression]\n"
             + "EXAMPLE\n\t" + invokeExpression + " 1d8 + 1\n"
@@ -101,8 +105,7 @@ public class MessageCommandRoll implements MessageCommand {
             + "to simulate a roll with those properties.  Supports basic arithmetic and parenthetical expressions."
             + "\n\n\tOnly supports 50 simultaneous dice rolls in a single statement (e.g., 50d6 + 12d8 is fine, but "
             + "100d6 is not).  Operation order is determined left-to-right, not by precedence.  Use parentheses if "
-            + "operation order matters for your roll.",
-            "");
+            + "operation order matters for your roll."));
 
         return docMessageBuilder.build();
     }
@@ -110,5 +113,11 @@ public class MessageCommandRoll implements MessageCommand {
     @Override
     public String invocationToken() {
         return CommandToken.COMMAND_ROLL.getCommandName();
+    }
+
+    @Override
+    public SlashCommandData asSlashCommand() {
+        return Commands.slash(this.invocationToken(), "Simulate a dice roll.")
+            .addOption(OptionType.STRING, "expression", "A standard dice rolling expression (e.g., 1d8 + 1).");
     }
 }

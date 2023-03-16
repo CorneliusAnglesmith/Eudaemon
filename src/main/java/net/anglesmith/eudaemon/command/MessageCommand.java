@@ -3,6 +3,9 @@ package net.anglesmith.eudaemon.command;
 import net.anglesmith.eudaemon.exception.EudaemonCommandException;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.util.List;
 
@@ -31,14 +34,14 @@ public interface MessageCommand {
      * @throws EudaemonCommandException if command arguments are not set before calling this command or if there were
      *                                  problems during execution.
      */
-    Message execute(MessageReceivedEvent messageEvent, List<String> messageTokens) throws EudaemonCommandException;
+    MessageCreateData execute(MessageReceivedEvent messageEvent, List<String> messageTokens) throws EudaemonCommandException;
 
     /**
      * Present help documentation for this Eudaemon command.
      *
      * @return A {@link Message} containing helpful information about this command.
      */
-    Message documentation();
+    MessageCreateData documentation();
 
     /**
      * Present this command's requested invocation command token.
@@ -46,4 +49,6 @@ public interface MessageCommand {
      * @return a {@link String} containing the token this command should be registered under.
      */
     String invocationToken();
+
+    SlashCommandData asSlashCommand();
 }

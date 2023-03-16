@@ -3,6 +3,7 @@ package net.anglesmith.eudaemon.command;
 import net.anglesmith.eudaemon.exception.EudaemonCommandException;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -17,10 +18,10 @@ public class CommandInterpreter {
         this.commandLibrary = commandLibrary;
     }
 
-    public Message executeMessageCommand(MessageReceivedEvent messageEvent, String messageContent) throws EudaemonCommandException {
+    public MessageCreateData executeMessageCommand(MessageReceivedEvent messageEvent, String messageContent) throws EudaemonCommandException {
         final List<String> messageTokens = Arrays.asList(messageContent.trim().split("\\s"));
         final MessageCommand resolvedCommand = this.commandLibrary.resolveExecutableCommand(messageTokens);
-        final Message commandResponse;
+        final MessageCreateData commandResponse;
 
         if (!resolvedCommand.validate(messageEvent, messageTokens)) {
             commandResponse = resolvedCommand.documentation();

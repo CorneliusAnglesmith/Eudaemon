@@ -4,7 +4,6 @@ import net.anglesmith.eudaemon.message.MessageService;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -15,7 +14,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
-import javax.security.auth.login.LoginException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -64,7 +62,8 @@ public class Eudaemon implements CommandLineRunner {
                     GatewayIntent.GUILD_MEMBERS,
                     GatewayIntent.GUILD_VOICE_STATES,
                     GatewayIntent.DIRECT_MESSAGES,
-                    GatewayIntent.DIRECT_MESSAGE_REACTIONS)
+                    GatewayIntent.DIRECT_MESSAGE_REACTIONS,
+                    GatewayIntent.MESSAGE_CONTENT)
                 .addEventListeners(new EudaemonListener(this.messageService))
                 .build();
 
@@ -73,8 +72,6 @@ public class Eudaemon implements CommandLineRunner {
             LOGGER.info("Eudaemon JDA startup completed.");
         } catch (ConfigurationException configEx) {
             LOGGER.fatal("Unable to load configuration file: " + CONFIG_FILE_LOCATION, configEx);
-        } catch (LoginException loginEx) {
-            LOGGER.fatal("Eudaemon login failed.", loginEx);
         } catch (InterruptedException interruptEx) {
             LOGGER.fatal("JDA startup on main thread interrupted!", interruptEx);
         }

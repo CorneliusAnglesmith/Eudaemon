@@ -2,9 +2,13 @@ package net.anglesmith.eudaemon.command;
 
 import net.anglesmith.eudaemon.exception.EudaemonCommandException;
 import net.anglesmith.eudaemon.message.Constants;
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import net.dv8tion.jda.api.utils.messages.MessageData;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -24,25 +28,25 @@ public class MessageCommandHelp implements MessageCommand {
     }
 
     @Override
-    public Message execute(MessageReceivedEvent messageEvent, List<String> messageTokens) throws EudaemonCommandException {
+    public MessageCreateData execute(MessageReceivedEvent messageEvent, List<String> messageTokens) throws EudaemonCommandException {
         final String joinedTokens = String.join(" ", messageTokens.subList(1, messageTokens.size()));
 
         final var requestedCommand = joinedTokens.trim();
 
-        final MessageBuilder documentationBuilder = new MessageBuilder();
+        final MessageCreateBuilder documentationBuilder = new MessageCreateBuilder();
 
         if (StringUtils.isBlank(requestedCommand)) {
             this.commandMap.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
                 .map(Map.Entry::getValue)
                 .map(MessageCommand::documentation)
-                .map(Message::getContentRaw)
-                .forEach(content -> documentationBuilder.append("\n").append(content));
+                .map(MessageData::getContent)
+                .forEach(content -> documentationBuilder.addContent("\n").addContent(content));
         } else {
-            documentationBuilder.append(
+            documentationBuilder.addContent(
                 Optional.ofNullable(this.commandMap.get(requestedCommand))
                     .map(MessageCommand::documentation)
-                    .map(Message::getContentRaw)
+                    .map(MessageData::getContent)
                     .orElse("Could not find documentation for '" + requestedCommand + "'."));
         }
 
@@ -50,15 +54,14 @@ public class MessageCommandHelp implements MessageCommand {
     }
 
     @Override
-    public Message documentation() {
-        final MessageBuilder docMessageBuilder = new MessageBuilder();
+    public MessageCreateData documentation() {
+        final MessageCreateBuilder docMessageBuilder = new MessageCreateBuilder();
         final String invokeExpression = Constants.COMMAND_INVOCATION_TOKEN + " " + this.invocationToken();
 
-        docMessageBuilder.appendCodeBlock(
-            "Documentation command.\n\n"
+        docMessageBuilder.addContent(
+            "```Documentation command.\n\n"
             + "SYNOPSIS\n\t" + invokeExpression + " [Eudaemon command]\n\t" + invokeExpression + "\n"
-            + "DESCRIPTION\n\tRetrieve documentation for a specific command, or for all commands.",
-            "");
+            + "DESCRIPTION\n\tRetrieve documentation for a specific command, or for all commands.```");
 
         return docMessageBuilder.build();
     }
@@ -66,5 +69,11 @@ public class MessageCommandHelp implements MessageCommand {
     @Override
     public String invocationToken() {
         return CommandToken.COMMAND_HELP.getCommandName();
+    }
+
+    @Override
+    public SlashCommandData asSlashCommand() {
+        return Commands.slash(this.invocationToken(), "Retrieve documentation for a specific command, or for all commands.")
+            .addOption(OptionType.STRING, "command", "The name of the command to retrieve documentation for.  Optional.");
     }
 }

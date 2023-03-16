@@ -2,9 +2,12 @@ package net.anglesmith.eudaemon.command;
 
 import net.anglesmith.eudaemon.exception.EudaemonCommandException;
 import net.anglesmith.eudaemon.message.Constants;
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import net.dv8tion.jda.api.utils.MarkdownUtil;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.util.List;
 import java.util.Map;
@@ -22,43 +25,42 @@ public class MessageCommandList implements MessageCommand {
     }
 
     @Override
-    public Message execute(MessageReceivedEvent messageEvent, List<String> messageTokens) throws EudaemonCommandException {
-        final MessageBuilder builder = new MessageBuilder();
+    public MessageCreateData execute(MessageReceivedEvent messageEvent, List<String> messageTokens) throws EudaemonCommandException {
+        final MessageCreateBuilder builder = new MessageCreateBuilder();
 
         if (messageTokens.size() > 1) {
-            builder.append("The List command takes no arguments.");
+            builder.addContent("The List command takes no arguments.");
         } else {
-            builder.append("The following commands are supported:\n");
+            builder.addContent("The following commands are supported:\n");
             this.commandMap.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
                 .map(Map.Entry::getValue)
                 .forEach(command ->
-                    builder.append(":point_right: ")
-                        .append(String.format("**%s**", command.invocationToken()))
-                        .append('\n'));
-            builder.append("Use ")
-                .append(String.format("`%s %s`",
+                    builder.addContent(":point_right: ")
+                        .addContent(String.format("**%s**", command.invocationToken()))
+                        .addContent("\n"));
+            builder.addContent("Use ")
+                .addContent(String.format("`%s %s`",
                     Constants.COMMAND_INVOCATION_TOKEN, "help"))
-                .append(" for more information about all commands or ")
-                .append(String.format("`%s %s [command name]`",
+                .addContent(" for more information about all commands or ")
+                .addContent(String.format("`%s %s [command name]`",
                     Constants.COMMAND_INVOCATION_TOKEN, "help"))
-                .append(" for a specific command.");
+                .addContent(" for a specific command.");
         }
 
         return builder.build();
     }
 
     @Override
-    public Message documentation() {
-        final MessageBuilder builder = new MessageBuilder();
+    public MessageCreateData documentation() {
+        final MessageCreateBuilder builder = new MessageCreateBuilder();
 
         final String invokeExpression = Constants.COMMAND_INVOCATION_TOKEN + " " + this.invocationToken();
 
-        builder.appendCodeBlock(
+        builder.addContent(MarkdownUtil.codeblock(
             "Command list utility.\n\n"
                 + "SYNOPSIS\n\t" + invokeExpression + "\n"
-                + "DESCRIPTION\n\tRetrieve a simple listing of all commands.",
-            "");
+                + "DESCRIPTION\n\tRetrieve a simple listing of all commands."));
 
         return builder.build();
     }
@@ -66,5 +68,10 @@ public class MessageCommandList implements MessageCommand {
     @Override
     public String invocationToken() {
         return CommandToken.COMMAND_LIST.getCommandName();
+    }
+
+    @Override
+    public SlashCommandData asSlashCommand() {
+        return Commands.slash(this.invocationToken(), "Retrieve a simple listing of all commands.");
     }
 }

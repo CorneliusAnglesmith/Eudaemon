@@ -3,7 +3,7 @@ apply plugin: 'java-library'
 
 dependencies {
     // JDA
-    implementation(group: 'net.dv8tion', name: 'JDA', version: '4.3.0_280')
+    implementation(group: 'net.dv8tion', name: 'JDA', version: '5.0.0-beta.5')
 
     // Apache
     implementation(group: 'org.apache.commons', name: 'commons-configuration2', version: '2.7')
@@ -20,8 +20,4 @@ dependencies {
 
 repositories {
     mavenCentral()
-    maven {
-        name 'm2-dv8tion'
-        url 'https://m2.dv8tion.net/releases'
-    }
 }
