@@ -1,7 +1,11 @@
 package net.anglesmith.eudaemon.command;
 
 import net.anglesmith.eudaemon.exception.EudaemonCommandException;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.util.List;
 
@@ -19,13 +23,32 @@ public interface MessageCommand {
      * @param messageTokens A {@link List} of {@link String} tokens acting as arguments for this command.
      * @return <code>true</code> if the command is acceptable.
      */
-    boolean accept(MessageReceivedEvent messageEvent, List<String> messageTokens);
+    boolean validate(MessageReceivedEvent messageEvent, List<String> messageTokens);
 
     /**
      * Execute the preset Eudaemon command.
      *
+     * @param messageEvent A {@link MessageReceivedEvent} invoking this command.
+     * @param messageTokens A {@link List} of {@link String} tokens acting as arguments for this command.
+     * @return A {@link Message} containing an appropriate response.
      * @throws EudaemonCommandException if command arguments are not set before calling this command or if there were
      *                                  problems during execution.
      */
-    void execute() throws EudaemonCommandException;
+    MessageCreateData execute(MessageReceivedEvent messageEvent, List<String> messageTokens) throws EudaemonCommandException;
+
+    /**
+     * Present help documentation for this Eudaemon command.
+     *
+     * @return A {@link Message} containing helpful information about this command.
+     */
+    MessageCreateData documentation();
+
+    /**
+     * Present this command's requested invocation command token.
+     *
+     * @return a {@link String} containing the token this command should be registered under.
+     */
+    String invocationToken();
+
+    SlashCommandData asSlashCommand();
 }

@@ -3,29 +3,21 @@ apply plugin: 'java-library'
 
 dependencies {
     // JDA
-
-    implementation(group: 'net.dv8tion', name: 'JDA', version: '3.8.0_434') {
-        exclude module: 'opus-java'
-    }
+    implementation(group: 'net.dv8tion', name: 'JDA', version: '5.0.0-beta.5')
 
     // Apache
-
-    implementation(group: 'org.apache.commons', name: 'commons-configuration2', version: '2.4')
-
-    implementation(group: 'org.apache.commons', name: 'commons-lang3', version: '3.8.1')
-
-    implementation(group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3')
+    implementation(group: 'org.apache.commons', name: 'commons-configuration2', version: '2.7')
+    implementation(group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0')
+    implementation(group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4')
 
     // Spring
+    implementation(group: 'org.springframework.boot', name: 'spring-boot-starter')
 
-    implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-web')
-
-    implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-actuator')
-
-    testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test')
+    // ANTLR
+    antlr (group: 'org.antlr', name: 'antlr4', version: '4.9.2')
+    implementation (group: 'org.antlr', name: 'antlr4-runtime', version: '4.9.2')
 }
 
 repositories {
     mavenCentral()
-    jcenter()
 }

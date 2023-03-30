@@ -1,5 +1,5 @@
 ext {
-    artifactVersion = '0.0.0'
+    artifactVersion = '0.1.0'
     artifactRootName = 'Eudaemon'
     
     artifactMainClass = 'net.anglesmith.eudaemon.Eudaemon'
